@@ -52,11 +52,10 @@
             <p>Your invoices, without the busywork.</p>
             <button type="button" class="upgrade-button">Explore Invoxa <span>↗</span></button>
           </div>
-          <button class="profile-button" type="button">
-            <span class="avatar">JD</span>
-            <span class="profile-copy"><strong>Jordan Davis</strong><small>Personal workspace</small></span>
-            <span class="profile-more">···</span>
-          </button>
+          <div class="profile-button" id="profile-summary">
+            <span class="avatar" id="profile-avatar">IN</span>
+            <span class="profile-copy"><strong id="profile-name">Not signed in</strong><small id="profile-email">Invoices stay on this device</small></span>
+          </div>
         </div>
       </aside>
 
@@ -65,8 +64,10 @@
           <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumb-current">Invoices</strong></div>
           <div class="topbar-actions">
             <span class="sync-status"><span class="sync-dot"></span> All changes saved</span>
+            <button type="button" class="button button-light google-button" id="auth-button">Sign in with Google</button>
+            <button type="button" class="text-button sign-out-button" id="sign-out-button" hidden>Sign out</button>
             <button class="icon-button help-button" aria-label="Help" type="button">?</button>
-            <button class="avatar top-avatar" aria-label="Profile" type="button">JD</button>
+            <span class="avatar top-avatar" id="top-avatar" aria-label="Account">IN</span>
           </div>
         </header>
 
@@ -240,6 +241,22 @@
             <button class="button button-dark" id="saved-new-button" type="button">＋ New invoice</button>
           </div>
           <div id="saved-list" class="saved-list"></div>
+        </section>
+
+        <section id="coming-soon-view" class="coming-soon-view" hidden aria-labelledby="coming-soon-title">
+          <div class="coming-soon-card">
+            <span class="coming-soon-badge"><span></span> IN THE WORKS</span>
+            <div class="coming-soon-mark" aria-hidden="true">✦</div>
+            <h2 id="coming-soon-title">A better way to manage clients is on its way.</h2>
+            <p id="coming-soon-description">Keep your client details, contacts, and invoice history together. Join the early access list and we’ll let you know when it’s ready.</p>
+            <form id="waitlist-form" class="waitlist-form">
+              <label class="visually-hidden" for="waitlist-email">Email address</label>
+              <input id="waitlist-email" type="email" name="email" maxlength="254" autocomplete="email" placeholder="you@company.com" required />
+              <button type="submit" class="button button-dark">Notify me <span>→</span></button>
+            </form>
+            <p id="waitlist-status" class="waitlist-status" role="status" aria-live="polite"></p>
+            <div class="coming-soon-footnote">No spam. Just one note when early access opens.</div>
+          </div>
         </section>
       </main>
     </div>

@@ -24,6 +24,8 @@ let toastTimer;
 let invoices = readStorage(STORAGE_KEYS.invoices, []);
 let activeInvoiceId = null;
 let rows = [];
+let currentUser = null;
+let currentComingSoonFeature = "clients";
 
 function readStorage(key, fallback) {
   try {
@@ -78,6 +80,38 @@ function showToast(message) {
   toast.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+}
+
+function initialsFor(user) {
+  const nameParts = (user.name || user.email || "Invoxa").trim().split(/\s+/);
+  return nameParts.slice(0, 2).map((part) => part[0]).join("").toLocaleUpperCase();
+}
+
+function renderAuthState() {
+  const signedIn = Boolean(currentUser);
+  document.querySelector("#auth-button").hidden = signedIn;
+  document.querySelector("#sign-out-button").hidden = !signedIn;
+  document.querySelector("#profile-name").textContent = currentUser?.name || "Not signed in";
+  document.querySelector("#profile-email").textContent = currentUser?.email || "Invoices stay on this device";
+  const initials = signedIn ? initialsFor(currentUser) : "IN";
+  document.querySelector("#profile-avatar").textContent = initials;
+  document.querySelector("#top-avatar").textContent = initials;
+  if (currentUser && document.querySelector("#waitlist-email").value === "") {
+    document.querySelector("#waitlist-email").value = currentUser.email;
+  }
+}
+
+async function loadAuthState() {
+  try {
+    const response = await fetch("/api/auth/me");
+    if (!response.ok) throw new Error(`Account check failed (${response.status}).`);
+    const result = await response.json();
+    currentUser = result.user || null;
+    renderAuthState();
+  } catch (error) {
+    console.error("Could not load the signed-in account.", error);
+    document.querySelector("#profile-email").textContent = "Sign-in status unavailable";
+  }
 }
 
 function getData() {
@@ -263,18 +297,52 @@ function renderSavedInvoices() {
 function showEditor() {
   document.querySelector("#invoice-workspace").hidden = false;
   document.querySelector("#saved-view").hidden = true;
+  document.querySelector("#coming-soon-view").hidden = true;
   document.querySelector("#page-title").textContent = "Create an invoice";
   document.querySelector("#page-subtitle").textContent = "A little less admin. A lot more getting paid.";
   document.querySelector("#breadcrumb-current").textContent = "Invoices";
+  setActiveNav("invoices");
 }
 
 function showSaved() {
   renderSavedInvoices();
   document.querySelector("#invoice-workspace").hidden = true;
   document.querySelector("#saved-view").hidden = false;
+  document.querySelector("#coming-soon-view").hidden = true;
   document.querySelector("#page-title").textContent = "Your invoices";
   document.querySelector("#page-subtitle").textContent = "Every detail, right where you left it.";
   document.querySelector("#breadcrumb-current").textContent = "Saved invoices";
+  setActiveNav("overview");
+}
+
+function setActiveNav(view) {
+  document.querySelectorAll(".nav-link").forEach((link) => {
+    link.classList.toggle("active", link.dataset.view === view);
+  });
+}
+
+function showComingSoon(feature) {
+  currentComingSoonFeature = feature;
+  const featureDetails = {
+    clients: {
+      title: "A better way to manage clients is on its way.",
+      description: "Keep your client details, contacts, and invoice history together. Join the early access list and we’ll let you know when it’s ready.",
+    },
+    items: {
+      title: "Your favorite services, ready when you are.",
+      description: "Build a reusable catalog of products and services, then add them to invoices in a click. Join the early access list for launch news.",
+    },
+  };
+  document.querySelector("#coming-soon-title").textContent = featureDetails[feature].title;
+  document.querySelector("#coming-soon-description").textContent = featureDetails[feature].description;
+  document.querySelector("#waitlist-status").textContent = "";
+  document.querySelector("#invoice-workspace").hidden = true;
+  document.querySelector("#saved-view").hidden = true;
+  document.querySelector("#coming-soon-view").hidden = false;
+  document.querySelector("#page-title").textContent = feature === "clients" ? "Clients" : "Items & services";
+  document.querySelector("#page-subtitle").textContent = "A little more of Invoxa is on its way.";
+  document.querySelector("#breadcrumb-current").textContent = feature === "clients" ? "Clients" : "Items & services";
+  setActiveNav(feature);
 }
 
 function openVersions() {
@@ -385,6 +453,51 @@ document.querySelector("#saved-new-button").addEventListener("click", () => {
   showEditor();
 });
 document.querySelector("#history-link").addEventListener("click", showSaved);
+document.querySelector("#auth-button").addEventListener("click", () => {
+  window.location.assign("/api/auth/google");
+});
+document.querySelector("#sign-out-button").addEventListener("click", async () => {
+  const button = document.querySelector("#sign-out-button");
+  button.disabled = true;
+  try {
+    const response = await fetch("/api/auth/logout", { method: "POST" });
+    if (!response.ok) throw new Error(`Sign-out failed (${response.status}).`);
+    currentUser = null;
+    renderAuthState();
+    showToast("You've been signed out.");
+  } catch (error) {
+    console.error("Could not sign out.", error);
+    showToast("Couldn't sign out. Please try again.");
+  } finally {
+    button.disabled = false;
+  }
+});
+document.querySelector("#waitlist-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const emailInput = document.querySelector("#waitlist-email");
+  const submitButton = form.querySelector('button[type="submit"]');
+  const status = document.querySelector("#waitlist-status");
+  submitButton.disabled = true;
+  status.textContent = "Adding you to the list…";
+  try {
+    const response = await fetch("/api/waitlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: emailInput.value, feature: currentComingSoonFeature }),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `Request failed (${response.status}).`);
+    status.textContent = "You're on the list. We'll be in touch when it's ready.";
+    form.reset();
+    renderAuthState();
+  } catch (error) {
+    console.error("Could not add the email to the waitlist.", error);
+    status.textContent = error.message || "Couldn't join the list. Please try again.";
+  } finally {
+    submitButton.disabled = false;
+  }
+});
 document.querySelector("#reset-button").addEventListener("click", () => {
   activeInvoiceId = null;
   setForm({ number: nextInvoiceNumber() });
@@ -392,11 +505,9 @@ document.querySelector("#reset-button").addEventListener("click", () => {
   showToast("Started a fresh invoice.");
 });
 document.querySelectorAll(".nav-link").forEach((button) => button.addEventListener("click", () => {
-  document.querySelectorAll(".nav-link").forEach((link) => link.classList.remove("active"));
-  button.classList.add("active");
   if (button.dataset.view === "invoices") showEditor();
   else if (button.dataset.view === "overview") showSaved();
-  else showToast(`${button.textContent.trim()} workspace is coming soon.`);
+  else showComingSoon(button.dataset.view);
 }));
 document.querySelector(".upgrade-button").addEventListener("click", () => showToast("You're all set — start by creating an invoice."));
 document.querySelector(".help-button").addEventListener("click", () => showToast("Need help? Print saves a PDF; your invoices stay on this device."));
@@ -405,3 +516,9 @@ const draft = readStorage(STORAGE_KEYS.current, {});
 activeInvoiceId = draft.invoiceId || null;
 setForm(draft);
 renderSavedInvoices();
+loadAuthState();
+const authResult = new URLSearchParams(window.location.search).get("auth");
+if (authResult === "error" || authResult === "cancelled") {
+  showToast(authResult === "cancelled" ? "Google sign-in was cancelled." : "Google sign-in failed. Please try again.");
+  window.history.replaceState({}, "", window.location.pathname);
+}
