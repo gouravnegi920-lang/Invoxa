@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f7f5" />
+    <title>Invoxa — Invoice workspace</title>
+    <meta
+      name="description"
+      content="Create polished invoices, calculate tax, and keep every version in one simple workspace."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Invoxa home">
+          <span class="brand-mark"><span></span><span></span><span></span></span>
+          <span>invoxa<span class="brand-dot">.</span></span>
+        </a>
+
+        <div class="workspace-label">WORKSPACE</div>
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-link" data-view="overview">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>
+            Overview
+          </button>
+          <button class="nav-link active" data-view="invoices">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.75h7l4 4v12.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z"/><path d="M14 3.75v4h4M8.5 12h7M8.5 15.5h7"/></svg>
+            Invoices <span class="nav-count" id="invoice-count">0</span>
+          </button>
+          <button class="nav-link" data-view="clients">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.25"/><path d="M3.75 19v-1.25a5.25 5.25 0 0 1 10.5 0V19M16 5.25a3.25 3.25 0 0 1 0 6.25M17.5 14a4.25 4.25 0 0 1 2.75 4v1"/></svg>
+            Clients
+          </button>
+          <button class="nav-link" data-view="items">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 8 4.25v8.5L12 20.5l-8-4.25v-8.5L12 3.5Z"/><path d="m4.5 8 7.5 4 7.5-4M12 12v8"/></svg>
+            Items &amp; services
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="upgrade-card">
+            <div class="upgrade-icon">✦</div>
+            <strong>Make room to grow</strong>
+            <p>Your invoices, without the busywork.</p>
+            <button type="button" class="upgrade-button">Explore Invoxa <span>↗</span></button>
+          </div>
+          <button class="profile-button" type="button">
+            <span class="avatar">JD</span>
+            <span class="profile-copy"><strong>Jordan Davis</strong><small>Personal workspace</small></span>
+            <span class="profile-more">···</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumb-current">Invoices</strong></div>
+          <div class="topbar-actions">
+            <span class="sync-status"><span class="sync-dot"></span> All changes saved</span>
+            <button class="icon-button help-button" aria-label="Help" type="button">?</button>
+            <button class="avatar top-avatar" aria-label="Profile" type="button">JD</button>
+          </div>
+        </header>
+
+        <section class="page-heading">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-line"></span> YOUR BUSINESS, IN GOOD ORDER</div>
+            <h1 id="page-title">Create an invoice</h1>
+            <p id="page-subtitle">A little less admin. A lot more getting paid.</p>
+          </div>
+          <button id="new-invoice-button" type="button" class="button button-dark"><span class="plus">＋</span> New invoice</button>
+        </section>
+
+        <div class="workspace-grid" id="invoice-workspace">
+          <section class="editor-column" aria-label="Invoice details">
+            <div class="editor-card">
+              <div class="card-heading">
+                <div>
+                  <span class="step-number">01</span>
+                  <h2>Invoice details</h2>
+                </div>
+                <button class="text-button" type="button" id="reset-button">Start fresh <span>↻</span></button>
+              </div>
+
+              <div class="form-grid invoice-meta">
+                <label class="field">
+                  <span>Invoice number</span>
+                  <input id="invoice-number" type="text" value="INV-2025-001" />
+                </label>
+                <label class="field">
+                  <span>Currency</span>
+                  <select id="currency">
+                    <option value="USD">USD — US Dollar</option>
+                    <option value="EUR">EUR — Euro</option>
+                    <option value="GBP">GBP — British Pound</option>
+                    <option value="CAD">CAD — Canadian Dollar</option>
+                    <option value="AUD">AUD — Australian Dollar</option>
+                    <option value="INR">INR — Indian Rupee</option>
+                    <option value="JPY">JPY — Japanese Yen</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Issue date</span>
+                  <input id="issue-date" type="date" />
+                </label>
+                <label class="field">
+                  <span>Due date</span>
+                  <input id="due-date" type="date" />
+                </label>
+              </div>
+
+              <div class="section-divider"></div>
+              <div class="form-grid party-grid">
+                <div class="party-block">
+                  <div class="field-label">FROM</div>
+                  <label class="field">
+                    <span class="visually-hidden">Your business name</span>
+                    <input id="from-name" type="text" value="Studio North" placeholder="Your business name" />
+                  </label>
+                  <label class="field">
+                    <span class="visually-hidden">Your email</span>
+                    <input id="from-email" type="email" value="hello@studionorth.co" placeholder="Email address" />
+                  </label>
+                </div>
+                <div class="party-block">
+                  <div class="field-label">BILL TO</div>
+                  <label class="field">
+                    <span class="visually-hidden">Client name</span>
+                    <input id="client-name" type="text" placeholder="Client or company name" />
+                  </label>
+                  <label class="field">
+                    <span class="visually-hidden">Client email</span>
+                    <input id="client-email" type="email" placeholder="client@company.com" />
+                  </label>
+                  <label class="field">
+                    <span class="visually-hidden">Client location</span>
+                    <select id="client-location">
+                      <option value="US">United States · 8% estimated tax</option>
+                      <option value="GB">United Kingdom · 20% VAT</option>
+                      <option value="EU">European Union · 20% VAT</option>
+                      <option value="CA">Canada · 5% GST</option>
+                      <option value="AU">Australia · 10% GST</option>
+                      <option value="IN">India · 18% GST</option>
+                      <option value="NONE">No tax · 0%</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div class="section-divider"></div>
+              <div class="items-heading">
+                <div>
+                  <span class="step-number">02</span>
+                  <h2>Line items</h2>
+                </div>
+                <button class="suggest-button" id="suggest-button" type="button"><span>✦</span> Suggest from history</button>
+              </div>
+              <div id="suggestion-panel" class="suggestion-panel" hidden></div>
+
+              <div class="line-items-header">
+                <span>DESCRIPTION</span><span>QTY</span><span>RATE</span><span>AMOUNT</span><span></span>
+              </div>
+              <div id="line-items"></div>
+              <button id="add-item-button" class="add-item-button" type="button"><span>＋</span> Add a line item</button>
+
+              <div class="section-divider"></div>
+              <div class="tax-row">
+                <div>
+                  <span class="field-label">TAX RATE</span>
+                  <p class="tax-help">Estimate based on your client's location. Please verify local rules.</p>
+                </div>
+                <label class="tax-input"><input id="tax-rate" type="number" min="0" max="100" step="0.1" value="8" aria-label="Tax rate percentage" /><span>%</span></label>
+              </div>
+
+              <div class="section-divider"></div>
+              <label class="field notes-field">
+                <span>Note to your client <span class="optional">· optional</span></span>
+                <textarea id="invoice-notes" rows="2" placeholder="A thank-you, payment details, or anything else they should know…"></textarea>
+              </label>
+            </div>
+            <div class="editor-footer">
+              <span><span class="lock-icon">⌑</span> Your invoice is saved on this device</span>
+              <button type="button" class="text-button" id="history-link">View saved invoices <span>→</span></button>
+            </div>
+          </section>
+
+          <aside class="preview-column">
+            <div class="preview-topline">
+              <div><span class="step-number">03</span><h2>Live preview</h2></div>
+              <button id="print-button" type="button" class="icon-button print-button" aria-label="Print or save as PDF" title="Print or save as PDF">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V4h10v4M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v6H7z"/></svg>
+              </button>
+            </div>
+            <article id="invoice-preview" class="invoice-paper">
+              <div class="paper-top">
+                <div class="paper-brand"><span class="brand-mark mini"><span></span><span></span><span></span></span><strong>INVOICE</strong></div>
+                <span class="paper-status">DRAFT</span>
+              </div>
+              <div class="paper-number" id="preview-number">INV-2025-001</div>
+              <div class="paper-rule"></div>
+              <div class="paper-parties">
+                <div><span class="paper-label">FROM</span><strong id="preview-from-name">Studio North</strong><span id="preview-from-email">hello@studionorth.co</span></div>
+                <div><span class="paper-label">BILL TO</span><strong id="preview-client-name">Your client</strong><span id="preview-client-email">Client email</span></div>
+              </div>
+              <div class="paper-dates">
+                <div><span class="paper-label">ISSUED</span><strong id="preview-issue-date">—</strong></div>
+                <div><span class="paper-label">DUE</span><strong id="preview-due-date">—</strong></div>
+              </div>
+              <div class="paper-items">
+                <div class="paper-item-head"><span>DESCRIPTION</span><span>AMOUNT</span></div>
+                <div id="preview-items"></div>
+              </div>
+              <div class="paper-totals">
+                <div><span>Subtotal</span><span id="preview-subtotal">$0.00</span></div>
+                <div><span id="preview-tax-label">Tax (8%)</span><span id="preview-tax">$0.00</span></div>
+                <div class="paper-total"><strong>Total due</strong><strong id="preview-total">$0.00</strong></div>
+              </div>
+              <div class="paper-note" id="preview-note" hidden></div>
+              <div class="paper-bottom"><span>Thank you for your business.</span><span id="preview-footer-business">Studio North</span></div>
+            </article>
+            <div class="preview-actions">
+              <button type="button" id="save-button" class="button button-dark save-button">Save invoice <span>→</span></button>
+              <button type="button" id="versions-button" class="button button-light">Version history <span class="version-count" id="version-count">0</span></button>
+            </div>
+            <div class="privacy-note"><span>✦</span> Suggestions learn from invoices saved on this device.</div>
+          </aside>
+        </div>
+
+        <section id="saved-view" class="saved-view" hidden>
+          <div class="saved-toolbar">
+            <div><span class="step-number">01</span><h2>Saved invoices</h2></div>
+            <button class="button button-dark" id="saved-new-button" type="button">＋ New invoice</button>
+          </div>
+          <div id="saved-list" class="saved-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <dialog id="versions-dialog" class="versions-dialog">
+      <div class="dialog-heading"><div><span class="eyebrow">INVOICE HISTORY</span><h2>Versions</h2></div><button class="icon-button dialog-close" aria-label="Close" type="button">×</button></div>
+      <p class="dialog-copy">Every save creates a snapshot, so you can always revisit an earlier version.</p>
+      <div id="versions-list" class="versions-list"></div>
+    </dialog>
+    <script src="app.js"></script>
+  </body>
+</html>
